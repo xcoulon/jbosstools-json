@@ -1,0 +1,101 @@
+grammar org.jboss.tools.json.JSON with org.eclipse.xtext.common.Terminals 
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+generate json "http://www.jboss.org/tools/json/JSON"
+
+JSONModel:
+	rootObject=JSONObject?
+;
+	
+JSONObject hidden (WS):
+	{JSONObject} '{' (pairs += Pair (TERMINAL_COMMA pairs+=Pair)*)? '}';
+	
+Pair hidden (WS) :
+	key=Key ':' value=Value
+;
+
+
+// *********************
+// Key: a quoted char
+// *********************
+Key:
+	name = TERMINAL_QUOTED_CHARS;
+
+// *********************
+// An Array is an ordered collection of values. 
+// An Array begins with[(left bracket) and ends with](right bracket). 
+// Values are separated by ,(comma).
+// *********************
+JSONArray hidden (WS):
+	'[' elements+=Value (TERMINAL_COMMA elements += Value )* ']'
+;
+
+// *********************
+// A value can be a string in double quotes, or a number, 
+// or true or false or null, or an object or an array. 
+// These structures can be nested.
+// *********************
+Value returns ecore::EObject:
+	JSONArray | JSONObject | JSONSimpleValue;
+
+JSONSimpleValue:
+	QuotedChars | Number | Null | True | False;
+	
+// *********************
+// CHARS (not using 'STRING' as an imported terminal rule with the same name already exists)
+// 'CHARS' is a sequence of zero or more Unicode characters, wrapped in double quotes, using backslash escapes. 
+// A character is represented as a single character string. A string is very much like a C or Java string.
+// *********************
+QuotedChars:
+	value = TERMINAL_QUOTED_CHARS
+;
+terminal TERMINAL_QUOTED_CHARS:
+	'"' ( '\\' ('b'|'t'|'n'|'f'|'r'|'u'|'"'|"'"|'\\') | !('\\'|'"') )* '"'
+;
+
+// *********************
+// NUMBER
+// A number is very much like a C or Java number, except that the octal and hexadecimal formats are not used.
+// *********************
+Number:
+	value = TERMINAL_NUMBER
+;
+terminal TERMINAL_NUMBER:
+	'-'? ('0' | DIGIT_1_9 DIGIT*) ('.' DIGIT+)? (EXP PLUS_MINUS? DIGIT+)?;
+
+terminal fragment DIGIT_1_9:
+	'1'..'9';
+terminal fragment DIGIT:
+	'0'..'9';
+terminal fragment EXP:
+	'e' | 'E';
+terminal fragment PLUS_MINUS:
+	'+' | '-';
+
+
+// *********************
+// null, true and false
+// *********************
+Null:
+	value = TERMINAL_NULL;
+
+terminal TERMINAL_NULL:
+	'null';
+	
+False:
+	value = TERMINAL_FALSE;
+
+terminal TERMINAL_FALSE:
+	'false';
+
+True:
+	value = TERMINAL_TRUE;
+
+terminal TERMINAL_TRUE:
+	'true';
+	
+terminal TERMINAL_COMMA:
+	','
+;
+

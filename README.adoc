@@ -1,0 +1,46 @@
+= JSON Tooling for JBoss Tools
+
+This repository contains an Xtext-based editor for JSON files
+It requires the extra update-sites to the current Target Platform:
+
+- http://download.eclipse.org/modeling/tmf/xtext/updates/composite/milestones (including required software)
+
+== Known issues
+
+Syntax coloring does not work (no idea why yet)
+Outline tree should be improved. For example, with the following content:
+
+[source, json]
+----
+{
+ "glossary": {
+  "title": "example glossary",
+  "GlossDiv": {
+   "title": "S",
+   "GlossList": {
+    "GlossEntry": {
+     "ID": "SGML",
+     "SortAs": "SGML",
+     "GlossTerm": "Standard Generalized Markup Language",
+     "Acronym": "SGML",
+     "Abbrev": "ISO 8879:1986",
+     "GlossDef": {
+      "para": "A meta-markup language, used to create markup languages such as DocBook.",
+      "GlossSeeAlso": ["GML", "XML"]
+     },
+     "GlossSee": "markup",
+     "test": 5
+    }
+   }
+  }
+ }
+}
+----
+
+there are a lot of "<unnamed>" nodes.
+
+Also, The key/value pairs should probably appear as a single node.
+
+The dialog asking if the user wants to add the XText nature to the current
+project has been be disabled using the info provided in http://www.eclipse.org/forums/index.php/t/158018/
+(see org.jboss.tools.json.ui.JSONUiModule#bindIXtextEditorCallback() in org.jboss.tools.json.ui bundle)
